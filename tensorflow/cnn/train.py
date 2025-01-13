@@ -17,6 +17,17 @@ x_test_cnn = x_test.reshape(-1, 28, 28, 1)
 y_train = to_categorical(y_train, 10)
 y_test = to_categorical(y_test, 10)
 
+# Exportar una imagen de ejemplo
+import matplotlib.pyplot as plt
+
+plt.imshow(x_train[0], cmap='gray')
+plt.axis('off')
+plt.savefig('example.png')
+plt.show()
+print(f"Clase de la imagen de ejemplo: {y_train[0]}")
+
+exit()
+
 # --------- CUDA ---------
 
 # Listar los dispositivos disponibles
@@ -41,6 +52,7 @@ import os
 
 if os.path.exists('model_nn.h5'):
     model_nn = tf.keras.models.load_model('model_nn.h5')
+    history_nn = None
 else:
     # Definir la arquitectura
     model_nn = Sequential([
@@ -71,6 +83,7 @@ import os
 
 if os.path.exists('model_cnn.h5'):
     model_cnn = tf.keras.models.load_model('model_cnn.h5')
+    history_cnn = None
 else:
     # Definir la arquitectura
     model_cnn = Sequential([
@@ -100,37 +113,38 @@ else:
 
 import matplotlib.pyplot as plt
 
-# Gráfica de precisión
-plt.plot(history_nn.history['accuracy'], label='NN - Entrenamiento')
-plt.plot(history_nn.history['val_accuracy'], label='NN - Validación')
-plt.plot(history_cnn.history['accuracy'], label='CNN - Entrenamiento')
-plt.plot(history_cnn.history['val_accuracy'], label='CNN - Validación')
-plt.title('Precisión durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Precisión')
-plt.legend()
-plt.show()
+if history_nn is not None and history_cnn is not None:
+    # Gráfica de precisión
+    plt.plot(history_nn.history['accuracy'], label='NN - Entrenamiento')
+    plt.plot(history_nn.history['val_accuracy'], label='NN - Validación')
+    plt.plot(history_cnn.history['accuracy'], label='CNN - Entrenamiento')
+    plt.plot(history_cnn.history['val_accuracy'], label='CNN - Validación')
+    plt.title('Precisión durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Precisión')
+    plt.legend()
+    plt.show()
 
-# Gráfica de pérdida
-plt.plot(history_nn.history['loss'], label='NN - Entrenamiento')
-plt.plot(history_nn.history['val_loss'], label='NN - Validación')
-plt.plot(history_cnn.history['loss'], label='CNN - Entrenamiento')
-plt.plot(history_cnn.history['val_loss'], label='CNN - Validación')
-plt.title('Pérdida durante el entrenamiento')
-plt.xlabel('Épocas')
-plt.ylabel('Pérdida')
-plt.legend()
-plt.show()
+    # Gráfica de pérdida
+    plt.plot(history_nn.history['loss'], label='NN - Entrenamiento')
+    plt.plot(history_nn.history['val_loss'], label='NN - Validación')
+    plt.plot(history_cnn.history['loss'], label='CNN - Entrenamiento')
+    plt.plot(history_cnn.history['val_loss'], label='CNN - Validación')
+    plt.title('Pérdida durante el entrenamiento')
+    plt.xlabel('Épocas')
+    plt.ylabel('Pérdida')
+    plt.legend()
+    plt.show()
 
-# --------- Comparar resultados ---------
+# --------- Mostrar modelos (en Conda no se ven bien, en Colab si) ---------
 
 from tensorflow.keras.utils import plot_model
 from PIL import Image
 
 # Dibujar la estructura del modelo de la red neuronal clásica con tamaño ajustado
-plot_model(model_nn, to_file='model_nn.png', show_shapes=True, show_layer_names=True, dpi=96)
+plot_model(model_nn, to_file='model_nn.png', show_shapes=True, show_layer_names=False, dpi=150)
 Image.open('model_nn.png').show()
 
 # Dibujar la estructura del modelo de la red neuronal convolucional con tamaño ajustado
-plot_model(model_cnn, to_file='model_cnn.png', show_shapes=True, show_layer_names=True, dpi=96)
+plot_model(model_cnn, to_file='model_cnn.png', show_shapes=True, show_layer_names=False, dpi=150)
 Image.open('model_cnn.png').show()
